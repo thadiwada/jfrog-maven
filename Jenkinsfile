@@ -12,7 +12,17 @@ node {
         rtMaven.tool = 'Maven-3.6.1' // Tool name from Jenkins configuration
         rtMaven.run pom: 'pom.xml', goals: 'clean test'
     }
-    
+    stage('SonarScan') {
+      withSonarQubeEnv('sonar') {
+         withMaven(jdk: 'JDK-1.8', maven: 'Maven-3.6.1') {
+             //sh 'mvn clean package sonar:sonar' 
+             sh ' mvn org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar ' +
+             ' -Dsonar.host.url=https://sonarcloud.io ' +
+             ' -Dsonar.organization=sonarproj '+ 
+             ' -Dsonar.login=e292265aa376852e65898024a5eea9b2dfc5693a '   
+         }
+      }
+   }
     stage('SonarQube Analysis') {
         rtMaven.run pom: 'maven-example/pom.xml', goals: 'clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=pattabhi -Dsonar.login=df5bb81bae9ba310d6a38135b957227ba6ecd32c '
      
